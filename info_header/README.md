@@ -9,8 +9,8 @@ modification d'image en grayscale (bmp 24 bits par px uniquement).
 ## Usage
 
 ```
-$ gcc -Wall -o info info_header.c
-$ ./info Classic.bmp
+$ make && ./info
+$ make clean
 ```
 
 ## Contributing

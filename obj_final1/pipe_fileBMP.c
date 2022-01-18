@@ -53,7 +53,7 @@ int main ( int argc, char* argv[] )
 	{
 		strcpy(ref, argv[1]) ;
 	}else{
-		fprintf(stderr, "Too much arguments or not enough : \nUsage : ./prog  (absolute_path/)<[name_file].bmp>  ../<[copy_nameFile].bmp>\n") ;
+		fprintf(stderr, "Too much arguments or not enough : \nUsage : ./prog  Classic.bmp>  Classic_final.bmp>\n") ;
 		exit(1) ;		//argument list too long or too short
 	}
 	

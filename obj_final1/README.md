@@ -9,9 +9,8 @@ modification d'image en grayscale (bmp 24 bits par px uniquement).
 ## Usage
 
 ```
-$ gcc -Wall -o prog pipe_fileBMP.c
-$ gcc -Wall -o fils fils.c
-$ ./prog  /<your_path_to>/<nameFile>.bmp <nameFile>_final.bmp
+$ make && ./prog Classic.bmp Classic_final.bmp
+$ make clean
 ```
 
 ## Contributing

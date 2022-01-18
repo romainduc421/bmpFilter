@@ -9,8 +9,8 @@ modification d'image en grayscale (bmp 24 bits par px uniquement).
 ## Usage
 
 ```
-$ gcc -Wall -o bmp_gray bmp_grayFilter.c
-$  ./bmp_gray /<your_path_to>/Classic.bmp
+$ make && ./bmp_gray Classic.bmp
+$ make clean
 ```
 
 ## Contributing

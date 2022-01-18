@@ -15,14 +15,14 @@
 #define SHORT_SIZE sizeof(unsigned short)
 
 
-void showBmpHead(BMPFILEHEADER* entete_fichier) 
+void showBmpHead(BMPFILEHEADER* entete_fichier)
 {
 	fprintf(stdout,"Taille du fichier bmp : %d Kio soit %d o\n", entete_fichier->file_size/1024, entete_fichier->file_size);
 	fprintf(stdout,"Réservé mot 1 : %d\n",  entete_fichier->reserved1);
 	fprintf(stdout,"Réservé mot 2 : %d\n",  entete_fichier->reserved2);
 	fprintf(stdout,"Octets de l'offset des données réelles de l'image : %d\n\n",  entete_fichier->bitmap_offset);
 }
-void showBmpInfoHead(BMPIMGHEADER* entete_bitmap) 
+void showBmpInfoHead(BMPIMGHEADER* entete_bitmap)
 {
 	fprintf(stdout,"Bitmap Information Header:\n" );
 	fprintf(stdout,"Taille de l'entête: %d\n" ,entete_bitmap->header_size);
@@ -50,16 +50,16 @@ int main ( int argc, char* argv[] )
 	char buff;
 	char chR[5],chR2[5], chB[5],chB2[5], chV[5], chV2[5];
 
-	
+
 
 	if(argc == 3)
 	{
 		strcpy(ref, argv[1]) ;
 	}else{
-		fprintf(stderr, "Too much arguments or not enough : \nUsage : ./prog  (absolute_path/)<[name_file].bmp>  ../<[copy_nameFile].bmp>\n") ;
+		fprintf(stderr, "Too much arguments or not enough : \nUsage : ./prog  Classic.bmp>  Classic_final.bmp>\n") ;
 		exit(1) ;		//argument list too long or too short
 	}
-	
+
 	if( stat(ref, &sts) == -1 && errno == ENOENT )
 	{
 		fprintf( stderr, "The file %s doesn't exist \n", argv[1] ) ;
@@ -71,11 +71,11 @@ int main ( int argc, char* argv[] )
 		fprintf(stderr, "This file is a directory : %s !\n", ref) ;
 		exit(1);
 	}
-	
+
 	strcat( res, argv[2] ) ;
-	
-	
-	
+
+
+
 	BMPFILEHEADER fileHeader;
 	BMPIMGHEADER infoHeader;
 	if(pipe(tube) == -1){
@@ -103,56 +103,56 @@ int main ( int argc, char* argv[] )
 			perror("open write file has failed");
 			exit(-1);
 		}
-		
+
 		//on verifie si c'est un bien un fichier bmp
 		read(desc, &fileHeader.file_type, SHORT_SIZE);
 		write(desc2, &fileHeader.file_type, SHORT_SIZE);
-		
+
 		if (fileHeader.file_type == 0x4d42 && fileHeader.file_type == 19778)   	//"BM"
 		{
 			fprintf(stdout,"The file type identification is correct!" );
 			fprintf(stdout,"\nFile identifier: %d\n", fileHeader.file_type);
 			read(desc, &fileHeader.file_size, INT_SIZE);
 			write(desc2, &fileHeader.file_size, INT_SIZE);
-			
+
 			lseek(desc, 0x0A, SEEK_SET) ;
 			lseek(desc2, 0x0A, SEEK_SET) ;
-			
+
 			read(desc, &fileHeader.bitmap_offset, INT_SIZE) ;
 			write(desc2, &fileHeader.bitmap_offset, INT_SIZE) ;
-			
+
 			read(desc, &infoHeader.header_size, INT_SIZE) ;
 			write(desc2, &infoHeader.header_size, INT_SIZE) ;
-			
+
 			read(desc, &infoHeader.width, INT_SIZE);
 			write(desc2, &infoHeader.width, INT_SIZE);
-			
+
 			read(desc, &infoHeader.height, INT_SIZE);
 			write(desc2, &infoHeader.height, INT_SIZE);
-			
+
 			read(desc, &infoHeader.planes, SHORT_SIZE) ;
 			write(desc2, &infoHeader.planes, SHORT_SIZE) ;
-			
+
 			read(desc, &infoHeader.bits_per_pixel, SHORT_SIZE);
 			write(desc2, &infoHeader.bits_per_pixel, SHORT_SIZE);
-			
+
 			lseek(desc, 0x1E, SEEK_SET) ;
 			lseek(desc2, 0x1E, SEEK_SET) ;
-			
+
 			read(desc, &infoHeader.compression, INT_SIZE);
 			write(desc2, &infoHeader.compression, INT_SIZE);
-			
+
 			read(desc, &infoHeader.size_bitmap, INT_SIZE) ;
 			write(desc2, &infoHeader.size_bitmap, INT_SIZE);
-			
+
 			showBmpHead(&fileHeader);
 			showBmpInfoHead(&infoHeader);
-			
+
 			if(infoHeader.bits_per_pixel != 0x18 || fileHeader.bitmap_offset != 54 || infoHeader.header_size != 40 || infoHeader.compression != 0 ){
 				fprintf(stderr, "Unsupported file format %d\n", infoHeader.bits_per_pixel);
 				exit(1) ;		//operation not permitted
 			}
-			
+
 			lseek(desc,fileHeader.bitmap_offset, SEEK_SET) ;
 			lseek(desc2, fileHeader.bitmap_offset, SEEK_SET) ;
 
@@ -160,12 +160,12 @@ int main ( int argc, char* argv[] )
 			{
 				write(desc2, &buff, sizeof(char)) ;
 			}
-			
-		
+
+
 			sprintf( ch6, "%d", fileHeader.bitmap_offset ) ;
 			sprintf( ch3, "%d", infoHeader.width ) ;
 			sprintf( ch4, "%d", infoHeader.height ) ;
-	
+
 		}
 		else
 		{
@@ -176,8 +176,8 @@ int main ( int argc, char* argv[] )
 		}
 
 	}
-	
-		
+
+
 	pid_t pid = fork() ;
 	if(pid == -1)
 	{
@@ -186,7 +186,7 @@ int main ( int argc, char* argv[] )
 	}
 	else if(!pid)
 	{		//fils lecteur?
-		
+
 		sprintf( ch, "%d", tube[0] ) ;
 		sprintf(ch2, "%d", tube[1]) ;
 		fprintf(stdout, "je suis le fils, mon pid est %d\n",getpid()) ;
@@ -195,12 +195,12 @@ int main ( int argc, char* argv[] )
 		if( execl ( "./recouvrant","recouvrant",ch, ch2, ch3, ch4 , ch6, ref,res, "G",NULL ) < 0)
 			fprintf(stderr, "Execl error\n") ;
 		exit(-1);
-		
+
 	}
 	else{
-		
+
 		pid_t pid1 = fork();
-		
+
 		if(!pid1){
 			sprintf( chR, "%d", red_pipe[0] ) ;
 			sprintf(chR2, "%d", red_pipe[1]) ;
@@ -210,7 +210,7 @@ int main ( int argc, char* argv[] )
 			exit(-1);
 		}
 		else{
-			
+
 			pid_t pid2 = fork();
 			if(!pid2){
 				sprintf( chB, "%d", blue_pipe[0] ) ;
@@ -221,10 +221,10 @@ int main ( int argc, char* argv[] )
 				exit(-1) ;
 			}
 			else{
-				
+
 				pid_t pid3 = fork();
 				if(!pid3){
-					
+
 					sprintf( chV, "%d", green_pipe[0] ) ;
 					sprintf(chV2, "%d", green_pipe[1]) ;
 					sleep(2);
@@ -233,12 +233,12 @@ int main ( int argc, char* argv[] )
 					exit(-1);
 				}
 				else{
-					
+
 					close(tube[0]) ;		//shut the read part
 					close(red_pipe[0]);
 					close(green_pipe[0]);
 					close(blue_pipe[0]);
-					
+
 					if(infoHeader.bits_per_pixel == 24)
 					{
 						int desc3=0 ;
@@ -259,14 +259,14 @@ int main ( int argc, char* argv[] )
 						close(green_pipe[1]);
 						close(blue_pipe[1]);
 						close(desc3);
-						
-						
+
+
 					}
 					else{
 						fprintf(stderr, "Unsupported file format : not 24 bytes/pixel");
 						return EXIT_FAILURE;
 					}
-					
+
 				}
 			}
 		}
@@ -275,4 +275,3 @@ int main ( int argc, char* argv[] )
 	close(desc2) ;
 	return 0;
 }
-

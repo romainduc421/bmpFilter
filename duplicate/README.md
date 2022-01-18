@@ -9,8 +9,8 @@ modification d'image en grayscale (bmp 24 bits par px uniquement).
 ## Usage
 
 ```
-$ gcc -Wall -o dup duplicate.c
-$ ./dup Classic.bmp
+$ make && ./dup Classic.bmp
+$ make clean
 ```
 
 ## Contributing
